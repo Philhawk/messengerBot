@@ -29,6 +29,9 @@ app.post('/webhook', function (req, res) {
             if (!kittenMessage(event.sender.id, event.message.text)) {
                 sendMessage(event.sender.id, {text: "Echo: " + event.message.text});
             }
+            if (!billMurrayMessage(event.sender.id, event.message.text)) {
+                sendMessage(event.sender.id, {text: "Echo: " + event.message.text});
+            }
         } else if (event.postback) {
           console.log("Postback received: " + JSON.stringify(event.postback));
         }
@@ -96,4 +99,44 @@ function kittenMessage(recipientId, text) {
 
     return false;
 
+};
+
+// send rich message with kitten
+function billMurrayMessage(recipientId, text) {
+
+    text = text || "";
+    var values = text.split(' ');
+
+    if (values[0] === 'murrayme') {
+        var imageUrl = "http://www.fillmurray.com//" + (Math.floor(Math.random() * 250) + 200) + "/" + (Math.floor(Math.random() * 250) + 200);
+
+        message = {
+            "attachment": {
+                "type": "template",
+                "payload": {
+                    "template_type": "generic",
+                    "elements": [{
+                        "title": "Bill Murray",
+                        "subtitle": "Because who doesn't love Bill",
+                        "image_url": imageUrl ,
+                        "buttons": [{
+                            "type": "web_url",
+                            "url": imageUrl,
+                            "title": "Show me more Bill"
+                            }, {
+                            "type": "postback",
+                            "title": "I love Bill",
+                            "payload": "User " + recipientId + " likes Bill Murray " + imageUrl,
+                        }]
+                    }]
+                }
+            }
+        };
+
+        sendMessage(recipientId, message);
+
+        return true;
+    }
+
+    return false;
 };
